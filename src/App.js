@@ -1,25 +1,32 @@
-import logo from './logo.svg';
-import './App.css';
-
-function App() {
+import React, { useEffect, useState } from "react";
+import MovieList from "./components/MovieList";
+import MovieInfo from "./components/MovieInfo";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
+import MovieContext from "./MovieContext";
+import axios from "axios";
+const App = () => {
+  const [shows, setShows] = useState([]);
+  useEffect(() => {
+    const fetchShows = async () => {
+      const response = await axios.get("https://api.tvmaze.com/search/shows?q=all");
+      setShows(response.data);
+    };
+    fetchShows();
+  }, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <MovieContext.Provider value={{ shows, setShows }}>
+      <Router>
+        <Switch>
+          <Route path="/" exact>
+            <MovieList />
+          </Route>
+          <Route path="/:id" exact>
+            <MovieInfo />
+          </Route>
+        </Switch>
+      </Router>
+    </MovieContext.Provider>
   );
-}
+};
 
 export default App;
